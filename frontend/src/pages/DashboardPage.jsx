@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
-import { FolderKanban, CheckCircle2, Clock, AlertTriangle, TrendingUp, ArrowRight, Calendar, Sparkles } from 'lucide-react';
+import { FolderKanban, CheckCircle2, Clock, AlertTriangle, TrendingUp, ArrowRight, Calendar, Sparkles, Filter } from 'lucide-react';
 import { format, isAfter, parseISO } from 'date-fns';
 
 const priorityClasses = {
@@ -41,92 +41,148 @@ export default function DashboardPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-full">
-      <div className="w-10 h-10 rounded-full animate-spin"
-        style={{ border: '3px solid transparent', borderTopColor: '#818cf8', borderRightColor: '#a855f7' }} />
+      <div className="w-10 h-10 rounded-full animate-spin border-t-indigo-500 border-2 border-white/10" />
     </div>
   );
 
   const statCards = [
-    { label: 'Total Projects', value: stats?.totalProjects || 0, icon: FolderKanban, gradient: 'from-indigo-500 to-purple-500', glow: '99, 102, 241' },
-    { label: 'My Tasks', value: stats?.myTasks || 0, icon: CheckCircle2, gradient: 'from-emerald-500 to-teal-500', glow: '16, 185, 129' },
-    { label: 'In Progress', value: stats?.inProgress || 0, icon: TrendingUp, gradient: 'from-cyan-500 to-blue-500', glow: '6, 182, 212' },
-    { label: 'Overdue', value: stats?.overdue || 0, icon: AlertTriangle, gradient: 'from-rose-500 to-pink-500', glow: '244, 63, 94' },
+    { label: 'Active Projects', value: stats?.totalProjects || 0, icon: FolderKanban, color: '#6366f1' },
+    { label: 'Tasks Assigned', value: stats?.myTasks || 0, icon: CheckCircle2, color: '#10b981' },
+    { label: 'In Progress', value: stats?.inProgress || 0, icon: TrendingUp, color: '#06b6d4' },
+    { label: 'Overdue', value: stats?.overdue || 0, icon: AlertTriangle, color: '#f43f5e' },
   ];
 
   return (
-    <div className="p-8 max-w-6xl mx-auto animate-fade-in">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold">
-          <span className="gradient-text">{getGreeting()}</span>, {user?.name?.split(' ')[0]}
-          <Sparkles className="inline w-6 h-6 text-amber-400 ml-2 mb-1" />
-        </h1>
-        <p className="text-slate-400 mt-1">Here's what's happening with your projects today.</p>
-      </div>
+    <div className="max-w-6xl mx-auto animate-fade-in space-y-10">
+      {/* Welcome Section */}
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-2 mb-2 text-indigo-400 font-semibold text-xs uppercase tracking-[0.2em]">
+            <Sparkles className="w-3 h-3" />
+            <span>Dashboard Overview</span>
+          </div>
+          <h1 className="text-4xl font-bold text-white tracking-tight">
+            {getGreeting()}, <span className="text-slate-400 font-normal">{user?.name?.split(' ')[0]}</span>
+          </h1>
+        </div>
+        <div className="flex items-center gap-3">
+           <button className="btn-secondary text-xs py-2 flex items-center gap-2">
+             <Calendar className="w-3.5 h-3.5" />
+             {format(new Date(), 'MMMM d, yyyy')}
+           </button>
+           <button className="btn-primary text-xs py-2">Create New Task</button>
+        </div>
+      </section>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {/* Stats Grid */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map(card => (
-          <div key={card.label} className="stat-card" style={{ '--stat-glow': card.glow }}>
-            <div className="flex items-start justify-between mb-3">
-              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${card.gradient} bg-opacity-20`}
-                style={{ background: `linear-gradient(135deg, rgba(${card.glow}, 0.15), rgba(${card.glow}, 0.05))` }}>
-                <card.icon className="w-5 h-5" style={{ color: `rgb(${card.glow})` }} />
-              </div>
+          <div key={card.label} className="stat-card group">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{card.label}</p>
+              <card.icon className="w-4 h-4 transition-transform group-hover:scale-110" style={{ color: card.color }} />
             </div>
-            <p className="text-3xl font-display font-bold text-white">{card.value}</p>
-            <p className="text-sm text-slate-400 mt-0.5">{card.label}</p>
+            <div className="mt-4 flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-white">{card.value}</span>
+              <span className="text-[10px] text-emerald-500 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">+12%</span>
+            </div>
           </div>
         ))}
-      </div>
+      </section>
 
-      {/* My Tasks */}
-      <div className="card">
-        <div className="flex items-center justify-between p-6 border-b border-white/[0.06]">
-          <div>
-            <h2 className="font-display text-lg font-bold gradient-text">My Assigned Tasks</h2>
-            <p className="text-sm text-slate-400 mt-0.5">Tasks assigned to you across all projects</p>
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Tasks Feed */}
+        <section className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-white flex items-center gap-3">
+              My Current Tasks
+              <span className="px-2 py-0.5 bg-white/5 text-slate-500 text-[10px] rounded-full border border-white/10 font-mono">
+                {recentTasks.length}
+              </span>
+            </h2>
+            <div className="flex items-center gap-2">
+               <button className="p-2 hover:bg-white/5 rounded-lg text-slate-500 transition-colors">
+                 <Filter className="w-4 h-4" />
+               </button>
+               <Link to="/projects" className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
+                 View Board
+               </Link>
+            </div>
           </div>
-          <Link to="/projects" className="btn-ghost text-sm flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300">
-            View all <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
 
-        {recentTasks.length === 0 ? (
-          <div className="p-12 text-center">
-            <CheckCircle2 className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-            <p className="text-slate-400 font-medium">No tasks assigned to you yet</p>
-            <p className="text-slate-500 text-sm mt-1">Tasks assigned to you will appear here</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-white/[0.04]">
-            {recentTasks.map(task => (
-              <div key={task._id} className="flex items-center gap-4 px-6 py-4 hover:bg-white/[0.02] transition-all duration-200">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-medium text-slate-200 truncate">{task.title}</p>
-                    <span className={`badge ${priorityClasses[task.priority]}`}>{task.priority}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: task.project?.color || '#6366f1', boxShadow: `0 0 6px ${task.project?.color || '#6366f1'}` }} />
-                      {task.project?.name}
-                    </span>
-                    {task.dueDate && (
-                      <span className={`flex items-center gap-1 ${isAfter(new Date(), parseISO(task.dueDate)) && task.status !== 'done' ? 'text-rose-400' : ''}`}>
-                        <Calendar className="w-3 h-3" />
-                        {format(parseISO(task.dueDate), 'MMM d')}
+          <div className="space-y-3">
+            {recentTasks.length === 0 ? (
+              <div className="card p-12 text-center border-dashed border-white/10">
+                <CheckCircle2 className="w-10 h-10 text-slate-800 mx-auto mb-4" />
+                <p className="text-slate-500 font-medium text-sm">All clear! No pending tasks assigned.</p>
+              </div>
+            ) : (
+              recentTasks.map(task => (
+                <div key={task._id} className="card p-5 group flex items-center gap-4">
+                  <div className={`w-1.5 h-10 rounded-full ${statusClasses[task.status]} opacity-50 group-hover:opacity-100 transition-opacity`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">#{task._id.slice(-4)}</span>
+                      <h3 className="text-sm font-semibold text-white truncate">{task.title}</h3>
+                    </div>
+                    <div className="flex items-center gap-4 text-[11px] text-slate-500">
+                      <span className="flex items-center gap-1.5">
+                        <FolderKanban className="w-3 h-3" style={{ color: task.project?.color }} />
+                        {task.project?.name}
                       </span>
-                    )}
+                      {task.dueDate && (
+                        <span className={`flex items-center gap-1.5 ${isAfter(new Date(), parseISO(task.dueDate)) && task.status !== 'done' ? 'text-rose-400' : ''}`}>
+                          <Calendar className="w-3 h-3" />
+                          {format(parseISO(task.dueDate), 'MMM d')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className={`badge ${priorityClasses[task.priority]}`}>{task.priority}</span>
+                    <button className="p-1 text-slate-600 hover:text-white transition-colors">
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-                <span className={`badge ${statusClasses[task.status]}`}>
-                  {task.status === 'in-progress' ? 'In Progress' : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-                </span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
-        )}
+        </section>
+
+        {/* Sidebar Activity/Tips */}
+        <aside className="space-y-6">
+           <div className="card p-6 bg-gradient-to-br from-indigo-500/10 to-transparent border-indigo-500/20">
+              <h3 className="text-white font-bold mb-2 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-indigo-400" />
+                Performance
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                You've completed 80% of your tasks this week. Keep going to stay ahead of schedule!
+              </p>
+              <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                <div className="bg-indigo-500 h-full w-[80%]" />
+              </div>
+           </div>
+
+           <div className="card p-6">
+              <h3 className="text-white font-bold mb-4 text-sm">Upcoming Deadlines</h3>
+              <div className="space-y-4">
+                {recentTasks.slice(0, 3).map(task => (
+                  <div key={task._id} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[10px] text-slate-400">
+                      {format(parseISO(task.dueDate), 'dd')}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-slate-200 truncate">{task.title}</p>
+                      <p className="text-[10px] text-slate-500">{task.project?.name}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+           </div>
+        </aside>
       </div>
     </div>
   );

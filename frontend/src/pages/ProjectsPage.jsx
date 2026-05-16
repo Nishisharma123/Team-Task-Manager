@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utils/api';
-import { Plus, FolderKanban, Users, Calendar, Loader2, X, Sparkles } from 'lucide-react';
+import { Plus, FolderKanban, Users, Calendar, Loader2, X, Sparkles, LayoutGrid, List, Search } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 
@@ -19,6 +19,7 @@ export default function ProjectsPage() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', color: '#6366f1', dueDate: '' });
   const [creating, setCreating] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchProjects = () => {
     api.get('/projects').then(res => setProjects(res.data.projects))
@@ -45,132 +46,158 @@ export default function ProjectsPage() {
     }
   };
 
+  const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
   return (
-    <div className="p-8 max-w-6xl mx-auto animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-6xl mx-auto animate-fade-in space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="font-display text-3xl font-bold gradient-text">Projects</h1>
-          <p className="text-slate-400 mt-1">{projects.length} project{projects.length !== 1 ? 's' : ''} total</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+            Projects Library
+            <span className="text-xs bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-500/20">
+              {projects.length} Total
+            </span>
+          </h1>
+          <p className="text-slate-500 mt-1 text-sm font-medium tracking-wide">Manage and organize your team's initiatives.</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
-          <Plus className="w-4 h-4" /> New Project
-        </button>
+        <div className="flex items-center gap-3">
+           <div className="relative group flex-1 md:flex-none">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+              <input 
+                type="text" 
+                placeholder="Search projects..." 
+                className="input py-2 pl-10 text-xs w-full md:w-64"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+           </div>
+           <button onClick={() => setShowModal(true)} className="btn-primary py-2 text-xs">
+             <Plus className="w-4 h-4" /> New Project
+           </button>
+        </div>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-10 h-10 rounded-full animate-spin"
-            style={{ border: '3px solid transparent', borderTopColor: '#818cf8', borderRightColor: '#a855f7' }} />
+        <div className="flex items-center justify-center py-24">
+          <div className="w-10 h-10 rounded-full animate-spin border-t-indigo-500 border-2 border-white/10" />
         </div>
-      ) : projects.length === 0 ? (
-        <div className="card p-16 text-center">
-          <FolderKanban className="w-16 h-16 text-slate-700 mx-auto mb-4" />
-          <h3 className="text-slate-200 font-display font-bold text-xl mb-2">No projects yet</h3>
-          <p className="text-slate-400 mb-6">Create your first project to get started</p>
-          <button onClick={() => setShowModal(true)} className="btn-primary inline-flex items-center gap-2 mx-auto">
-            <Plus className="w-4 h-4" /> Create Project
+      ) : filteredProjects.length === 0 ? (
+        <div className="card p-20 text-center border-dashed border-white/10">
+          <div className="w-16 h-16 bg-white/[0.03] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-white/10 shadow-inner">
+            <FolderKanban className="w-8 h-8 text-slate-700" />
+          </div>
+          <h3 className="text-white font-bold text-xl mb-2">No projects found</h3>
+          <p className="text-slate-500 mb-8 max-w-xs mx-auto">Either you haven't created any projects yet or your search query didn't match anything.</p>
+          <button onClick={() => setShowModal(true)} className="btn-primary mx-auto py-2.5 px-8">
+            Start Your First Project
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {projects.map(project => (
-            <Link key={project._id} to={`/projects/${project._id}`}
-              className="card p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group block relative overflow-hidden">
-              {/* Top accent line */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ background: `linear-gradient(90deg, transparent, ${project.color}, transparent)` }} />
-
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${project.color}30, ${project.color}10)`, border: `1px solid ${project.color}40` }}>
-                  <FolderKanban className="w-5 h-5" style={{ color: project.color }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-display font-bold text-white truncate group-hover:text-indigo-300 transition-colors">{project.name}</h3>
-                  <span className={`badge text-xs ${statusBadge[project.status]}`}>{project.status}</span>
-                </div>
-              </div>
-
-              {project.description && (
-                <p className="text-sm text-slate-400 mb-4 line-clamp-2">{project.description}</p>
-              )}
-
-              <div className="flex items-center justify-between text-xs text-slate-500">
-                <span className="flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5" />
-                  {project.members?.length || 0} member{project.members?.length !== 1 ? 's' : ''}
-                </span>
-                {project.dueDate && (
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {format(parseISO(project.dueDate), 'MMM d, yyyy')}
-                  </span>
-                )}
-              </div>
-
-              {/* Member avatars */}
-              <div className="flex -space-x-2 mt-3">
-                {project.members?.slice(0, 4).map(m => (
-                  <div key={m.user?._id} title={m.user?.name}
-                    className="w-7 h-7 rounded-full border-2 border-[#0a0a1a] flex items-center justify-center text-xs font-bold text-white"
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}>
-                    {m.user?.name?.charAt(0).toUpperCase()}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map(project => (
+            <Link key={project._id} to={`/projects/${project._id}`} className="card p-0 group flex flex-col overflow-hidden">
+              {/* Card Header with Color Accent */}
+              <div className="h-2 w-full" style={{ backgroundColor: project.color }} />
+              
+              <div className="p-6 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <h3 className="text-lg font-bold text-white group-hover:text-indigo-400 transition-colors truncate tracking-tight">{project.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className={`badge ${statusBadge[project.status]}`}>{project.status}</span>
+                      <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">v1.0</span>
+                    </div>
                   </div>
-                ))}
-                {project.members?.length > 4 && (
-                  <div className="w-7 h-7 rounded-full bg-white/[0.08] border-2 border-[#0a0a1a] flex items-center justify-center text-xs text-slate-300">
-                    +{project.members.length - 4}
-                  </div>
+                </div>
+
+                {project.description && (
+                  <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed min-h-[40px]">{project.description}</p>
                 )}
+
+                <div className="pt-4 border-t border-white/[0.04] flex items-center justify-between">
+                   <div className="flex items-center gap-4 text-[11px] text-slate-400 font-medium">
+                      <span className="flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5" />
+                        {project.members?.length || 0}
+                      </span>
+                      {project.dueDate && (
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {format(parseISO(project.dueDate), 'MMM d')}
+                        </span>
+                      )}
+                   </div>
+                   <div className="flex -space-x-2">
+                      {project.members?.slice(0, 3).map(m => (
+                        <div key={m.user?._id} className="w-6 h-6 rounded-full border-2 border-[#0a0a0f] bg-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
+                          {m.user?.name?.charAt(0).toUpperCase()}
+                        </div>
+                      ))}
+                      {project.members?.length > 3 && (
+                        <div className="w-6 h-6 rounded-full bg-white/5 border-2 border-[#0a0a0f] flex items-center justify-center text-[8px] text-slate-400 font-bold">
+                          +{project.members.length - 3}
+                        </div>
+                      )}
+                   </div>
+                </div>
               </div>
             </Link>
           ))}
         </div>
       )}
 
-      {/* Create Modal */}
+      {/* Modal Overhaul */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md p-6 animate-slide-up">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-xl font-bold gradient-text flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-fuchsia-400" /> New Project
-              </h2>
-              <button onClick={() => setShowModal(false)} className="btn-ghost p-2">
-                <X className="w-4 h-4" />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <div className="card w-full max-w-lg p-8 animate-fade-in shadow-2xl">
+            <div className="flex items-center justify-between mb-8">
+              <div className="space-y-1">
+                <h2 className="text-2xl font-bold text-white tracking-tight">Initiate Project</h2>
+                <p className="text-xs text-slate-500 font-medium">Define your team's next major goal.</p>
+              </div>
+              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                <X className="w-5 h-5 text-slate-500" />
               </button>
             </div>
-            <form onSubmit={handleCreate} className="space-y-4">
+            
+            <form onSubmit={handleCreate} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
-                <input className="input" placeholder="Project name" value={form.name}
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Project Name</label>
+                <input className="input" placeholder="e.g. Q4 Marketing Campaign" value={form.name}
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
-                <textarea className="input resize-none" rows={3} placeholder="Optional description..."
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Description</label>
+                <textarea className="input resize-none" rows={3} placeholder="Briefly describe the objective..."
                   value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Color</label>
-                <div className="flex gap-2 flex-wrap">
-                  {PROJECT_COLORS.map(c => (
-                    <button key={c} type="button" onClick={() => setForm(f => ({ ...f, color: c }))}
-                      className={`w-8 h-8 rounded-full transition-all duration-200 ${form.color === c ? 'ring-2 ring-white ring-offset-2 ring-offset-[#0a0a1a] scale-110' : 'hover:scale-110'}`}
-                      style={{ backgroundColor: c, boxShadow: form.color === c ? `0 0 15px ${c}60` : 'none' }} />
-                  ))}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Theme Color</label>
+                  <div className="flex gap-2 flex-wrap mt-1">
+                    {PROJECT_COLORS.map(c => (
+                      <button key={c} type="button" onClick={() => setForm(f => ({ ...f, color: c }))}
+                        className={`w-6 h-6 rounded-md transition-all duration-200 border-2 ${form.color === c ? 'border-white scale-110' : 'border-transparent hover:scale-105'}`}
+                        style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Target Date</label>
+                  <input type="date" className="input py-2 text-xs" value={form.dueDate}
+                    onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Due Date</label>
-                <input type="date" className="input" value={form.dueDate}
-                  onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} />
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">Cancel</button>
-                <button type="submit" disabled={creating} className="btn-primary flex-1 flex items-center justify-center gap-2">
-                  {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                  Create
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1 py-3">Cancel</button>
+                <button type="submit" disabled={creating} className="btn-primary flex-1 py-3 group">
+                  {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                    <>
+                      <span>Deploy Project</span>
+                      <Sparkles className="w-4 h-4 transition-transform group-hover:rotate-12" />
+                    </>
+                  )}
                 </button>
               </div>
             </form>
