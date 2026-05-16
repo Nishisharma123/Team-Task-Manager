@@ -25,7 +25,7 @@ export default function Layout() {
               <CheckSquare className="w-5 h-5 text-white relative z-10" />
             </div>
             <div>
-              <h1 className="font-display text-lg font-bold gradient-text leading-none">TaskFlow</h1>
+              <h1 className="font-display text-lg font-bold gradient-text leading-none">Team <Manager></Manager></h1>
               <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-fuchsia-400" /> Team Manager
               </p>

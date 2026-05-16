@@ -32,7 +32,9 @@ export default function ProjectDetailPage() {
   const [memberRole, setMemberRole] = useState('Member');
   const [addingMember, setAddingMember] = useState(false);
 
-  const isAdmin = project?.members?.find(m => m.user?._id === user?._id)?.role === 'Admin';
+  const isAdmin = user?.role === 'admin';
+  const isProjectAdmin = project?.members?.find(m => m.user?._id === user?._id)?.role === 'Admin';
+  const canManageTasks = isAdmin || isProjectAdmin;
 
   const fetchData = async () => {
     try {
@@ -144,7 +146,7 @@ export default function ProjectDetailPage() {
             {project?.description && <p className="text-sm text-slate-400">{project.description}</p>}
           </div>
           <div className="flex items-center gap-2">
-            {isAdmin && (
+            {canManageTasks && (
               <>
                 <button onClick={() => setMemberModal(true)} className="btn-secondary flex items-center gap-2 text-sm">
                   <UserPlus className="w-4 h-4" /> Members
@@ -154,9 +156,11 @@ export default function ProjectDetailPage() {
                 </button>
               </>
             )}
-            <button onClick={() => setTaskModal({ open: true, task: null })} className="btn-primary flex items-center gap-2 text-sm">
-              <Plus className="w-4 h-4" /> Add Task
-            </button>
+            {canManageTasks && (
+              <button onClick={() => setTaskModal({ open: true, task: null })} className="btn-primary flex items-center gap-2 text-sm">
+                <Plus className="w-4 h-4" /> Add Task
+              </button>
+            )}
           </div>
         </div>
 
@@ -189,16 +193,18 @@ export default function ProjectDetailPage() {
                       {tasksByStatus(col.id).length}
                     </span>
                   </div>
-                  <button onClick={() => setTaskModal({ open: true, task: null })}
-                    className="text-slate-500 hover:text-slate-300 transition-colors">
-                    <Plus className="w-4 h-4" />
-                  </button>
+                  {canManageTasks && (
+                    <button onClick={() => setTaskModal({ open: true, task: null })}
+                      className="text-slate-500 hover:text-slate-300 transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
 
                 <div className="flex-1 p-3 space-y-2 overflow-y-auto">
                   {tasksByStatus(col.id).map(task => (
-                    <TaskCard key={task._id} task={task} isAdmin={isAdmin}
-                      onEdit={(t) => setTaskModal({ open: true, task: t })}
+                    <TaskCard key={task._id} task={task} isAdmin={canManageTasks}
+                      onEdit={(t) => canManageTasks && setTaskModal({ open: true, task: t })}
                       onDelete={handleDeleteTask} />
                   ))}
                   {tasksByStatus(col.id).length === 0 && (
@@ -234,7 +240,7 @@ export default function ProjectDetailPage() {
                     <span className={`badge text-xs ${m.role === 'Admin' ? 'bg-amber-400/10 text-amber-400 border border-amber-400/20' : 'bg-white/[0.06] text-slate-400 border border-white/[0.06]'}`}>
                       {m.role}
                     </span>
-                    {isAdmin && m.user?._id !== project?.owner?._id && m.user?._id !== user?._id && (
+                    {canManageTasks && m.user?._id !== project?.owner?._id && m.user?._id !== user?._id && (
                       <button onClick={() => handleRemoveMember(m.user?._id)}
                         className="text-slate-500 hover:text-rose-400 transition-colors">
                         <X className="w-4 h-4" />

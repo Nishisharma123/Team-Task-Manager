@@ -12,12 +12,12 @@ export default function TaskCard({ task, onEdit, onDelete, isAdmin }) {
   const isOverdue = task.dueDate && isAfter(new Date(), parseISO(task.dueDate)) && task.status !== 'done';
 
   return (
-    <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.12] hover:bg-white/[0.05] transition-all duration-300 group cursor-pointer hover:shadow-lg hover:shadow-indigo-500/[0.03]"
-      onClick={() => onEdit(task)}>
+    <div className={`bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.12] hover:bg-white/[0.05] transition-all duration-300 group ${isAdmin ? 'cursor-pointer' : 'cursor-default'} hover:shadow-lg hover:shadow-indigo-500/[0.03]`}
+      onClick={() => isAdmin && onEdit(task)}>
       <div className="flex items-start justify-between gap-2 mb-2">
         <p className="text-sm font-medium text-slate-200 leading-snug flex-1">{task.title}</p>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-          {(isAdmin || true) && (
+          {isAdmin && (
             <button onClick={e => { e.stopPropagation(); onDelete(task._id); }}
               className="p-1 rounded-lg hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 transition-colors">
               <Trash2 className="w-3.5 h-3.5" />

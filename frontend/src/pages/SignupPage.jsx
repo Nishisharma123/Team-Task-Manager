@@ -5,7 +5,7 @@ import { CheckSquare, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function SignupPage() {
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'member' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
@@ -16,7 +16,7 @@ export default function SignupPage() {
     if (form.password.length < 6) return toast.error('Password must be at least 6 characters');
     setLoading(true);
     try {
-      await signup(form.name, form.email, form.password);
+      await signup(form.name, form.email, form.password, form.role);
       toast.success('Account created successfully!');
       navigate('/dashboard');
     } catch (err) {
@@ -64,6 +64,14 @@ export default function SignupPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Role</label>
+              <select className="input" value={form.role}
+                onChange={e => setForm(f => ({ ...f, role: e.target.value }))}>
+                <option value="member">Member</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
             <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2 py-3">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
