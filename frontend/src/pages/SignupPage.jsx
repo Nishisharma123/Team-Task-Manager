@@ -32,42 +32,13 @@ export default function SignupPage() {
       <div className="glass-glow opacity-50" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
       
-      <div className="w-full max-w-[1000px] grid lg:grid-cols-2 card overflow-hidden backdrop-blur-3xl">
-        {/* Branding Side */}
-        <div className="hidden lg:flex flex-col justify-between p-12 bg-indigo-600 relative overflow-hidden text-white">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-700 opacity-90" />
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
-          
-          <div className="relative z-10">
-             <div className="flex items-center gap-3 mb-12">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-lg">
-                  <CheckSquare className="w-6 h-6 text-indigo-600" />
-                </div>
-                <span className="text-2xl font-bold tracking-tight">TaskFlow</span>
-             </div>
-             
-             <h2 className="text-4xl font-bold leading-tight mb-6">
-                Streamline your team's workflow in minutes.
-             </h2>
-             <p className="text-indigo-100/80 leading-relaxed max-w-sm">
-                Join 50,000+ teams who use TaskFlow to manage projects, track time, and ship products faster.
-             </p>
-          </div>
-
-          <div className="relative z-10">
-             <div className="flex -space-x-3 mb-4">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-9 h-9 rounded-full border-2 border-indigo-600 bg-indigo-400" />
-                ))}
-                <div className="w-9 h-9 rounded-full border-2 border-indigo-600 bg-white/10 flex items-center justify-center text-[10px] font-bold">+2k</div>
-             </div>
-             <p className="text-sm font-medium text-indigo-100">Trusted by modern engineering teams worldwide.</p>
-          </div>
-        </div>
-
+      <div className="w-full max-w-md card overflow-hidden backdrop-blur-3xl">
         {/* Form Side */}
-        <div className="p-10 lg:p-16 bg-[#0c0c14]">
-          <div className="mb-10">
+        <div className="p-10 lg:p-12 bg-[#0c0c14]">
+          <div className="mb-10 text-center">
+            <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center shadow-lg mx-auto mb-6">
+              <CheckSquare className="w-7 h-7 text-white" />
+            </div>
             <h1 className="text-3xl font-bold text-white mb-2">Create an account</h1>
             <p className="text-slate-500 text-sm">Join the next generation of task management.</p>
           </div>

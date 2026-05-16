@@ -31,42 +31,13 @@ export default function LoginPage() {
       <div className="glass-glow opacity-50" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
       
-      <div className="w-full max-w-[1000px] grid lg:grid-cols-2 card overflow-hidden backdrop-blur-3xl">
-        {/* Branding Side */}
-        <div className="hidden lg:flex flex-col justify-between p-12 bg-indigo-600 relative overflow-hidden text-white">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-indigo-900 opacity-90" />
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
-          
-          <div className="relative z-10">
-             <div className="flex items-center gap-3 mb-12">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-lg">
-                  <CheckSquare className="w-6 h-6 text-indigo-600" />
-                </div>
-                <span className="text-2xl font-bold tracking-tight">TaskFlow</span>
-             </div>
-             
-             <h2 className="text-4xl font-bold leading-tight mb-6">
-                Pick up exactly where you left off.
-             </h2>
-             <p className="text-indigo-100/80 leading-relaxed max-w-sm">
-                Access your dashboard, manage your team, and keep your projects moving forward with our powerful workspace.
-             </p>
-          </div>
-
-          <div className="relative z-10 card p-6 bg-white/10 border-white/20 backdrop-blur-md">
-             <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-full bg-emerald-400/20 flex items-center justify-center">
-                   <Sparkles className="w-4 h-4 text-emerald-400" />
-                </div>
-                <p className="text-xs font-bold uppercase tracking-widest text-emerald-300">New Feature</p>
-             </div>
-             <p className="text-sm text-indigo-100">AI-powered task prioritization is now live for all Pro users.</p>
-          </div>
-        </div>
-
+      <div className="w-full max-w-md card overflow-hidden backdrop-blur-3xl">
         {/* Form Side */}
-        <div className="p-10 lg:p-16 bg-[#0c0c14]">
-          <div className="mb-10 text-center lg:text-left">
+        <div className="p-10 lg:p-12 bg-[#0c0c14]">
+          <div className="mb-10 text-center">
+            <div className="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center shadow-lg mx-auto mb-6">
+              <CheckSquare className="w-7 h-7 text-white" />
+            </div>
             <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
             <p className="text-slate-500 text-sm">Please enter your details to sign in.</p>
           </div>
