@@ -26,24 +26,34 @@ const PublicRoute = ({ children }) => {
 
 function AppRoutes() {
   return (
-    <>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          success: { iconTheme: { primary: '#6172f5', secondary: '#fff' } }
-        }}
-      />
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-        <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
-        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/projects/:id" element={<ProjectDetailPage />} />
-        </Route>
-      </Routes>
-    </>
+    <div className="bg-orbs relative min-h-screen">
+      <div className="bg-orb-3" />
+      <div className="relative z-10">
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: 'rgba(15, 15, 35, 0.9)',
+              color: '#e2e8f0',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backdropFilter: 'blur(12px)',
+            },
+            success: { iconTheme: { primary: '#818cf8', secondary: '#fff' } },
+            error: { iconTheme: { primary: '#f43f5e', secondary: '#fff' } },
+          }}
+        />
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+          <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/:id" element={<ProjectDetailPage />} />
+          </Route>
+        </Routes>
+      </div>
+    </div>
   );
 }
 

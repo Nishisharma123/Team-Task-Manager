@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { CheckSquare, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { CheckSquare, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -29,11 +29,15 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-brand-600 rounded-2xl mb-4 shadow-xl shadow-brand-900/40">
-            <CheckSquare className="w-7 h-7 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-5 shadow-2xl relative overflow-hidden"
+            style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7, #ec4899)', boxShadow: '0 8px 40px rgba(99, 102, 241, 0.4)' }}>
+            <CheckSquare className="w-8 h-8 text-white relative z-10" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-white">Welcome back</h1>
-          <p className="text-slate-400 mt-2">Sign in to your TaskFlow account</p>
+          <h1 className="font-display text-4xl font-bold gradient-text">Welcome back</h1>
+          <p className="text-slate-400 mt-2 flex items-center justify-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-fuchsia-400" />
+            Sign in to your TaskFlow account
+          </p>
         </div>
 
         <div className="card p-8">
@@ -63,13 +67,13 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
-            <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2">
+            <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2 py-3">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               Sign In
             </button>
@@ -77,7 +81,7 @@ export default function LoginPage() {
 
           <p className="text-center text-slate-400 text-sm mt-6">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-brand-400 hover:text-brand-300 font-medium">Sign up</Link>
+            <Link to="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">Sign up</Link>
           </p>
         </div>
       </div>
